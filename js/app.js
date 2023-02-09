@@ -97,9 +97,6 @@ if (activarFuncion) {
 
 document.addEventListener("DOMContentLoaded", () => {
   carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-
-  mostrarCarrito();
-  document.querySelector("#activarFuncion").click(procesarPedido);
 });
 if (formulario) {
   formulario.addEventListener("submit", enviarCompra);
@@ -122,7 +119,9 @@ if (procesarCompra) {
         confirmButtonText: "Aceptar",
       });
     } else {
-      location.href = "compra.html";
+      alert(
+        "Muchas gracias por su compra. ¡En los próximos 5 días hábiles podrás retirarlo en nustra casa central!"
+      );
     }
   });
 }
@@ -131,14 +130,13 @@ stockProductos.forEach((prod) => {
   const { id, nombre, precio, desc, img, cantidad } = prod;
   if (contenedor) {
     contenedor.innerHTML += `
-    <div class="card mt-3" style="width: 18rem;">
+    <div class="card bg-dark text-light mt-3" style="width: 18rem;">
     <img class="card-img-top mt-2" src="${img}" alt="Card image cap">
     <div class="card-body">
       <h5 class="card-title">${nombre}</h5>
-      <p class="card-text">Precio: ${precio}</p>
+      <p class="card-text">Precio: $${precio} ARS</p>
       <p class="card-text">Descripcion: ${desc}</p>
-      <p class="card-text">Cantidad: ${cantidad}</p>
-      <button class="btn btn-primary" onclick="agregarProducto(${id})">Comprar Producto</button>
+      <button class="btn btn-primary" onclick="agregarProducto(${id})">Agregar al carrito</button>
     </div>
   </div>
     `;
@@ -175,7 +173,7 @@ const mostrarCarrito = () => {
         </div>
         <div>
         <p>Producto: ${nombre}</p>
-      <p>Precio: ${precio}</p>
+      <p>Precio: $${precio} ARS</p>
       <p>Cantidad :${cantidad}</p>
       <button class="btn btn-danger"  onclick="eliminarProducto(${id})">Eliminar producto</button>
         </div>
@@ -237,69 +235,4 @@ function procesarPedido() {
     (acc, prod) => acc + prod.cantidad * prod.precio,
     0
   );
-}
-
-function enviarCompra(e) {
-  e.preventDefault();
-  const cliente = document.querySelector("#cliente").value;
-  const email = document.querySelector("#correo").value;
-
-  if (email === "" || cliente == "") {
-    Swal.fire({
-      title: "¡Debes completar tu email y nombre!",
-      text: "Rellena el formulario",
-      icon: "error",
-      confirmButtonText: "Aceptar",
-    });
-  } else {
-    const btn = document.getElementById("button");
-
-    // document.getElementById('procesar-pago')
-    //  .addEventListener('submit', function(event) {
-    //    event.preventDefault();
-
-    btn.value = "Enviando...";
-
-    const serviceID = "default_service";
-    const templateID = "template_qxwi0jn";
-
-    emailjs.sendForm(serviceID, templateID, this).then(
-      () => {
-        btn.value = "Finalizar compra";
-        alert("Correo enviado!");
-      },
-      (err) => {
-        btn.value = "Finalizar compra";
-        alert(JSON.stringify(err));
-      }
-    );
-
-    const spinner = document.querySelector("#spinner");
-    spinner.classList.add("d-flex");
-    spinner.classList.remove("d-none");
-
-    setTimeout(() => {
-      spinner.classList.remove("d-flex");
-      spinner.classList.add("d-none");
-      formulario.reset();
-
-      const alertExito = document.createElement("p");
-      alertExito.classList.add(
-        "alert",
-        "alerta",
-        "d-block",
-        "text-center",
-        "col-12",
-        "mt-2",
-        "alert-success"
-      );
-      alertExito.textContent = "Compra realizada correctamente";
-      formulario.appendChild(alertExito);
-
-      setTimeout(() => {
-        alertExito.remove();
-      }, 3000);
-    }, 3000);
-  }
-  localStorage.clear();
 }
